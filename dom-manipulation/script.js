@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", function(){
         console.log("Hello")
         arrayQuotes = localStorage.getItem("quotes")
     
-        quotes = new Blob([arrayQuotes])
+        quotes = new Blob([arrayQuotes],  {type: "application/json"})
         const objectUrl = URL.createObjectURL(quotes)
         let link = document.createElement("a")
         link.setAttribute("href", objectUrl)

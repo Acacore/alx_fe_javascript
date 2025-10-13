@@ -62,10 +62,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let quoteDisplay = document.querySelector("#quoteDisplay")
     let newQuote = document.querySelector("#newQuote")
+    let newQuoteCategory = document.querySelector("#newQuoteCategory")
+    let newQuoteText = document.querySelector("#newQuoteText")
+    
    
     function showRandomQuote() {
         quoteDisplay.innerHTML = ""
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)]
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)].text
         let newQuote = document.createElement("h1")
         newQuote.innerHTML = randomQuote
         quoteDisplay.appendChild(newQuote)
@@ -76,5 +79,26 @@ document.addEventListener("DOMContentLoaded", function () {
         showRandomQuote()
     ))
  
-    
+    window.addQuote = function () {
+        let thenewQuote = newQuoteCategory.value
+        let thenewQuoteText = newQuoteText.value
+
+        if (thenewQuote.length > 0 && thenewQuoteText.length > 0) {
+            quoteDisplay.innerHTML=""
+            let thenewQuoteToAdd = { category: thenewQuote, name: thenewQuoteText }
+           
+            quotes.push(thenewQuoteToAdd)
+            console.log(quotes)
+            thenewQuote.value = ""
+            thenewQuoteText = ""
+        } else {
+            quoteDisplay.innerHTML=""
+            let newQuote = document.createElement("p")
+            newQuote.innerHTML = "You did not input a value"
+            newQuote.style.color = "red"
+            quoteDisplay.appendChild(newQuote)
+            
+        }
+        
+    }
 })

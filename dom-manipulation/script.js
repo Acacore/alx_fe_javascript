@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", function () {
     let quoteDisplay = document.querySelector("#quoteDisplay")
     let newQuote = document.querySelector("#newQuote")
     let newQuoteCategory = document.querySelector("#newQuoteCategory")
-    let newQuoteText = document.querySelector("#newQuoteText")
+    let newQuoteText = document.getElementById("newQuoteText")
     
    
     function showRandomQuote() {
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
             let createAddQuoteForm = { category: thenewQuote, name: thenewQuoteText }
            
             quotes.push(createAddQuoteForm)
-            console.log(quotes)
+            
             newQuoteCategory.value = ""
             newQuoteText.value = ""
             let newQuote = document.createElement("h3")

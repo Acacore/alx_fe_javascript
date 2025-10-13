@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
  
-    const quotes = [
+    let quotes = [
         
         // {
         //     text: "Programs must be written for people to read, and only incidentally for machines to execute.",
@@ -69,7 +69,10 @@ document.addEventListener("DOMContentLoaded", function () {
    
     function showRandomQuote() {
         quoteDisplay.innerHTML = ""
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)].text
+        quotes = JSON.parse(localStorage.getItem("quotes"))
+        console.log(quotes)
+        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)].name
+        console.log(`the quote: ${randomQuote}`)
         let newQuote = document.createElement("h3")
         newQuote.innerHTML = randomQuote
         quoteDisplay.appendChild(newQuote)
@@ -87,7 +90,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if (thenewQuote.length > 0 && thenewQuoteText.length > 0) {
             quoteDisplay.innerHTML=""
             let createAddQuoteForm = { category: thenewQuote, name: thenewQuoteText }
-           
             quotes.push(createAddQuoteForm)
             localStorage.setItem("quotes", JSON.stringify(quotes))
             newQuoteCategory.value = ""
@@ -107,11 +109,12 @@ document.addEventListener("DOMContentLoaded", function () {
         
     }
 
+
     function importFromJsonFile(event) {
         const fileReader = new FileReader();
         fileReader.onload = function(event) {
             const importedQuotes = JSON.parse(event.target.result);
-            quotes.push(...importedQuotes);
+            quotes.push(importedQuotes);
             console.log(quotes)
             saveQuotes();
             alert('Quotes imported successfully!');

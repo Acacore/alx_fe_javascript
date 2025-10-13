@@ -1,20 +1,63 @@
 document.addEventListener("DOMContentLoaded", function () {
  
     const quotes = [
-        "Programs must be written for people to read, and only incidentally for machines to execute.",
-        "Talk is cheap. Show me the code.",
-        "The best error message is the one that never shows up.",
-        "First, solve the problem. Then, write the code.",
-        "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
-        "Experience is the name everyone gives to their mistakes.",
-        "The only way to learn a new programming language is by writing programs in it.",
-        "Don’t worry if it doesn’t work right. If everything did, you’d be out of a job.",
-        "Code never lies, comments sometimes do.",
-        "It’s not a bug – it’s an undocumented feature.",
-        "The function of good software is to make the complex appear simple.",
-        "Dream in code, build in reality.",
-        "If you’re the smartest person in the room, you’re in the wrong room.",
-        "Keep calm and code on."
+        
+        {
+            text: "Programs must be written for people to read, and only incidentally for machines to execute.",
+            category: "Programming Wisdom"
+        },
+        {
+            text: "Any fool can write code that a computer can understand. Good programmers write code that humans can understand.",
+            category: "Programming Wisdom"
+        },
+        {
+            text: "The function of good software is to make the complex appear simple.",
+            category: "Programming Wisdom"
+        },
+        {
+            text: "Code never lies, comments sometimes do.",
+            category: "Programming Wisdom"
+        },
+        {
+            text: "First, solve the problem. Then, write the code.",
+            category: "Programming Wisdom"
+        },
+        {
+            text: "Dream in code, build in reality.",
+            category: "Motivational"
+        },
+        {
+            text: "If you’re the smartest person in the room, you’re in the wrong room.",
+            category: "Motivational"
+        },
+        {
+            text: "Keep calm and code on.",
+            category: "Motivational"
+        },
+        {
+            text: "Talk is cheap. Show me the code.",
+            category: "Humor"
+        },
+        {
+            text: "It’s not a bug – it’s an undocumented feature.",
+            category: "Humor"
+        },
+        {
+            text: "Don’t worry if it doesn’t work right. If everything did, you’d be out of a job.",
+            category: "Humor"
+        },
+        {
+            text: "The best error message is the one that never shows up.",
+            category: "Learning"
+        },
+        {
+            text: "Experience is the name everyone gives to their mistakes.",
+            category: "Learning"
+        },
+        {
+            text: "The only way to learn a new programming language is by writing programs in it.",
+            category: "Learning"
+        }
     ]
 
     let quoteDisplay = document.querySelector("#quoteDisplay")

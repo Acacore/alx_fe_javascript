@@ -14,11 +14,17 @@
     <button onclick="exportQuote()">Export Quotes</button>
   </div>
 
+  
+
 
     <h1>Dynamic Quote Generator</h1>
     <div id="quoteDisplay"></div>
     <input type="file" id="importFile" accept=".json" onchange="importFromJsonFile(event)" />
     <button id="newQuote">Show New Quote</button>
+     <select id="categoryFilter" onchange="filterQuotes()">
+    <option value="all">All Categories</option>
+    <!-- Dynamically populated categories -->
+  </select>
 
     
     

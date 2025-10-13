@@ -1,4 +1,5 @@
-document.addEventListener("DOMContentLoaded", function(){
+let categoryFilter
+document.addEventListener("DOMContentLoaded", function () {
  
     let quotes = [
         
@@ -65,6 +66,7 @@ document.addEventListener("DOMContentLoaded", function(){
     let newQuoteCategory = document.querySelector("#newQuoteCategory")
     let newQuoteText = document.getElementById("newQuoteText")
     let loadFile = document.getElementsByClassName("loadFile")
+    categoryFilter = document.getElementById("categoryFilter")
     
    
     function showRandomQuote() {
@@ -122,7 +124,7 @@ document.addEventListener("DOMContentLoaded", function(){
         fileReader.readAsText(event.target.files[0]);
     }
 
-    window.exportQuote = function () {
+    window.exportQuote= function () {
         console.log("Hello")
         arrayQuotes = localStorage.getItem("quotes")
     
@@ -134,8 +136,41 @@ document.addEventListener("DOMContentLoaded", function(){
         link.click()
     }
     
-    saveQuotes(quotes)(
-         localStorage.setItem("quotes", quotes)
-     );
+    // saveQuotes(quotes)(
+    //      localStorage.setItem("quotes", quotes)
+    // );
+    
+    window.onload = function () {
+        
+        let allquotes = JSON.parse(localStorage.getItem("quotes"))
+        let categorySet = new Set()
+        allquotes.forEach(quote => {
+            categorySet.add(quote.category)
+        });
+        categorySet.forEach(function (category) {
+            const option = document.createElement('option');
+            option.textContent = category
+            categoryFilter.appendChild(option)
+        })
+       
+   
+        // filterQuotes()
+    }
+
+     
+     
 
 })
+function filterQuotes() {
+            category = categoryFilter.value
+    let allquotes = JSON.parse(localStorage.getItem("quotes"))
+    quoteDisplay.innerHTML=""
+    allquotes.forEach(function (quote) {
+        if (quote.category == category){
+            let aquote = document.createElement("h3")
+            aquote.innerHTML = quote.name
+            quoteDisplay.appendChild(aquote)
+        }
+    })
+    
+        }

@@ -69,7 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function showRandomQuote() {
         quoteDisplay.innerHTML = ""
         const randomQuote = quotes[Math.floor(Math.random() * quotes.length)].text
-        let newQuote = document.createElement("h1")
+        let newQuote = document.createElement("h3")
         newQuote.innerHTML = randomQuote
         quoteDisplay.appendChild(newQuote)
     }
@@ -85,12 +85,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (thenewQuote.length > 0 && thenewQuoteText.length > 0) {
             quoteDisplay.innerHTML=""
-            let thenewQuoteToAdd = { category: thenewQuote, name: thenewQuoteText }
+            let createAddQuoteForm = { category: thenewQuote, name: thenewQuoteText }
            
-            quotes.push(thenewQuoteToAdd)
+            quotes.push(createAddQuoteForm)
             console.log(quotes)
-            thenewQuote.value = ""
-            thenewQuoteText = ""
+            newQuoteCategory.value = ""
+            newQuoteText.value = ""
+            let newQuote = document.createElement("h3")
+            newQuote.innerHTML = createAddQuoteForm.name
+            quoteDisplay.appendChild(newQuote)
         } else {
             quoteDisplay.innerHTML=""
             let newQuote = document.createElement("p")

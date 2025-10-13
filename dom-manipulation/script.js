@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", function(){
  
     let quotes = [
         
@@ -114,13 +114,28 @@ document.addEventListener("DOMContentLoaded", function () {
         const fileReader = new FileReader();
         fileReader.onload = function(event) {
             const importedQuotes = JSON.parse(event.target.result);
-            quotes.push(importedQuotes);
+            quotes.push(...importedQuotes);
             console.log(quotes)
-            saveQuotes();
+            saveQuotes(quotes);
             alert('Quotes imported successfully!');
         };
         fileReader.readAsText(event.target.files[0]);
     }
+
+    window.exportQuote = function () {
+        console.log("Hello")
+        arrayQuotes = localStorage.getItem("quotes")
     
+        quotes = new Blob([arrayQuotes])
+        const objectUrl = URL.createObjectURL(quotes)
+        let link = document.createElement("a")
+        link.setAttribute("href", objectUrl)
+        link.setAttribute("download", "quotes.JSON")
+        link.click()
+    }
+    
+    saveQuotes(quotes)(
+         localStorage.setItem("quotes", quotes)
+     );
 
 })

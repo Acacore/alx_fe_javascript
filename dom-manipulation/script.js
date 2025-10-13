@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //      localStorage.setItem("quotes", quotes)
     // );
     
-    window.onload = function () {
+    window.onload = function populateCategories() {
         
         let allquotes = JSON.parse(localStorage.getItem("quotes"))
         let categorySet = new Set()
@@ -162,15 +162,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 })
 function filterQuotes() {
-            category = categoryFilter.value
+    category = categoryFilter.value
     let allquotes = JSON.parse(localStorage.getItem("quotes"))
     quoteDisplay.innerHTML=""
-    allquotes.forEach(function (quote) {
-        if (quote.category == category){
-            let aquote = document.createElement("h3")
-            aquote.innerHTML = quote.name
-            quoteDisplay.appendChild(aquote)
-        }
-    })
+    // First, filter the matching quotes
+    const matchingQuotes = allquotes.filter(quote => quote.category === category);
+
+    // Then, use map to create the DOM elements from those quotes
+    const elements = matchingQuotes.map(quote => {
+        const aquote = document.createElement("h3");
+        aquote.innerHTML = quote.name;
+        return aquote;
+    });
+
+// Finally, append all elements to the display (you could also use forEach here if preferred)
+elements.forEach(el => quoteDisplay.appendChild(el));
     
         }

@@ -60,7 +60,8 @@ document.addEventListener("DOMContentLoaded", function () {
         //     category: "Learning"
         // }
     ]
-
+    
+    // localStorage.removeItem("quotes");
     let quoteDisplay = document.querySelector("#quoteDisplay")
     let newQuote = document.querySelector("#newQuote")
     let newQuoteCategory = document.querySelector("#newQuoteCategory")
@@ -70,15 +71,47 @@ document.addEventListener("DOMContentLoaded", function () {
     
    
     function showRandomQuote() {
-        quoteDisplay.innerHTML = ""
-        quotes = JSON.parse(localStorage.getItem("quotes"))
-        console.log(quotes)
-        const randomQuote = quotes[Math.floor(Math.random() * quotes.length)].name
-        console.log(`the quote: ${randomQuote}`)
-        let newQuote = document.createElement("h3")
-        newQuote.innerHTML = randomQuote
-        quoteDisplay.appendChild(newQuote)
+    quoteDisplay.innerHTML = "";
+
+    const allquotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+    // Get selected category from dropdown
+    const selectedCategory = document.getElementById("categoryFilter").value;
+
+    if (!selectedCategory) {
+        const msg = document.createElement("p");
+        msg.textContent = "Please select a category first.";
+        msg.style.color = "red";
+        quoteDisplay.appendChild(msg);
+        return;
     }
+
+    // Find the category object
+    const categoryData = allquotes.find(
+        (q) => q.category === selectedCategory.toUpperCase()
+    );
+
+    // Handle missing category or empty quotes
+    if (!categoryData || !categoryData.name || categoryData.name.length === 0) {
+        const msg = document.createElement("p");
+        msg.textContent = `No quotes found for ${selectedCategory}.`;
+        msg.style.color = "gray";
+        quoteDisplay.appendChild(msg);
+        return;
+    }
+
+    // Pick one random quote from this category
+    const randomIndex = Math.floor(Math.random() * categoryData.name.length);
+    const randomQuote = categoryData.name[randomIndex];
+
+    // Display it
+    const newQuote = document.createElement("h3");
+    newQuote.textContent = `"${randomQuote}"`;
+    quoteDisplay.appendChild(newQuote);
+
+    console.log(`📜 Random quote from ${selectedCategory}: ${randomQuote}`);
+}
+
 
     newQuote.addEventListener("click", () => (
     
@@ -103,48 +136,61 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     window.onload = populateCategories;
  
-    window.addQuote = function () {
-        let thenewQuoteCategory = newQuoteCategory.value.toUpperCase()
-        let thenewQuoteText = newQuoteText.value
+window.addQuote = function () {
+    const thenewQuoteCategory = newQuoteCategory.value.trim().toUpperCase();
+    const thenewQuoteText = newQuoteText.value.trim();
 
-        if (thenewQuoteCategory.length > 0 && thenewQuoteText.length > 0) {
-            quoteDisplay.innerHTML=""
-            // let createAddQuoteForm = { category: thenewQuoteCategory, name: thenewQuoteText }
-            // quotes.push(createAddQuoteForm)
-
-            // Fetch all code from local Storage to check category
-            let allquotes = JSON.parse(localStorage.getItem("quotes")) //Fetch all quotes from the local storage
-            console.log(allquotes)
-            let createAddQuoteForm
-            let categorySet = new Set()
-            allquotes.forEach(quote => {
-                categorySet.add(quote.category) // store it into the categorySet
-            });
-            categorySet.add(thenewQuoteCategory) // add the new it to the categorySet
-            categorySet.forEach(function (category) {
-                if (thenewQuoteCategory.toUpperCase() === category.toUpperCase()) {
-                    createAddQuoteForm = { category: thenewQuoteCategory, name: thenewQuoteText }
-                    allquotes.push(createAddQuoteForm) 
-                }
-            })
-            localStorage.setItem("quotes", JSON.stringify(allquotes))
-            populateCategories()
-            newQuoteCategory.value = ""
-            newQuoteText.value = ""
-            let newQuote = document.createElement("h3")
-            newQuote.innerHTML = createAddQuoteForm.name
-            quoteDisplay.appendChild(newQuote)
-
-        } else {
-            quoteDisplay.innerHTML=""
-            let newQuote = document.createElement("p")
-            newQuote.innerHTML = "You did not input a value"
-            newQuote.style.color = "red"
-            quoteDisplay.appendChild(newQuote)
-            
-        }
-        
+    // Validation
+    if (thenewQuoteCategory.length === 0 || thenewQuoteText.length === 0) {
+        quoteDisplay.innerHTML = "";
+        const msg = document.createElement("p");
+        msg.innerHTML = "You did not input a value";
+        msg.style.color = "red";
+        quoteDisplay.appendChild(msg);
+        return;
     }
+
+    // Fetch all quotes from localStorage
+    let allquotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+    // Check if category already exists
+    let existingCategory = allquotes.find(
+        (quote) => quote.category === thenewQuoteCategory
+    );
+
+    if (existingCategory) {
+        // Make sure 'name' is an array, then add new quote
+        if (!Array.isArray(existingCategory.name)) {
+            existingCategory.name = [existingCategory.name];
+        }
+        existingCategory.name.push(thenewQuoteText);
+    } else {
+        // Add new category object
+        allquotes.push({
+            category: thenewQuoteCategory,
+            name: [thenewQuoteText],
+        });
+    }
+
+    // Save updated quotes back to localStorage
+    localStorage.setItem("quotes", JSON.stringify(allquotes));
+    console.log("✅ Updated quotes:", allquotes);
+
+    // Update dropdown in real-time
+    populateCategories();
+
+    // Clear input fields
+    newQuoteCategory.value = "";
+    newQuoteText.value = "";
+
+    // Display confirmation
+    quoteDisplay.innerHTML = "";
+    const newQuote = document.createElement("h3");
+    newQuote.innerHTML = `"${thenewQuoteText}" added to ${thenewQuoteCategory}`;
+    newQuote.style.color = "green";
+    quoteDisplay.appendChild(newQuote);
+};
+
 
 
     function importFromJsonFile(event) {

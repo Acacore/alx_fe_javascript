@@ -60,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
         //     category: "Learning"
         // }
     ]
-    
+
     // localStorage.removeItem("quotes");
     let quoteDisplay = document.querySelector("#quoteDisplay")
     let newQuote = document.querySelector("#newQuote")
@@ -174,7 +174,7 @@ window.addQuote = function () {
 
     // Save updated quotes back to localStorage
     localStorage.setItem("quotes", JSON.stringify(allquotes));
-    console.log("✅ Updated quotes:", allquotes);
+
 
     // Update dropdown in real-time
     populateCategories();
@@ -220,28 +220,174 @@ window.addQuote = function () {
     // saveQuotes(quotes)(
     //      localStorage.setItem("quotes", quotes)
     // );
+
+
+    /**********************************************************
+ * STEP 1: SIMULATE SERVER INTERACTION
+ **********************************************************/
+
+// The mock server endpoint — you can replace this later
+// with your own JSON server or hosted quotes API.
+const SERVER_URL = "https://jsonplaceholder.typicode.com/posts";
+
+// This function simulates fetching quotes from a remote server.
+async function fetchQuotesFromServer() {
+    try {
+        // Fetch simulated data from the mock API
+        const response = await fetch(SERVER_URL);
+
+        // Convert the response into JavaScript objects
+        const data = await response.json();
+
+        // For demo purposes, we’ll just use the first 10 items
+        // and transform them to look like our quote objects
+        return data.slice(0, 10).map(post => ({
+            category: "SERVER_CATEGORY",
+            name: [`${post.title}`] // Each "title" is a quote string
+        }));
+    } catch (error) {
+        // If the network fails, log the error but don’t crash
+        console.error("Error fetching quotes from server:", error);
+        return []; // Return empty so app still works offline
+    }
+}
+
     
-   
+    /**********************************************************
+ * STEP 2: IMPLEMENT DATA SYNCING
+ **********************************************************/
 
-     
-     
+// This function handles syncing between server and local data
+async function syncQuotes() {
+    console.log(" Syncing with server...");
 
-})
-function filterQuotes() {
-    category = categoryFilter.value
-    let allquotes = JSON.parse(localStorage.getItem("quotes"))
-    quoteDisplay.innerHTML=""
-    // First, filter the matching quotes
-    const matchingQuotes = allquotes.filter(quote => quote.category === category);
+    //  Fetch all the latest quotes from the simulated server
+    const serverQuotes = await fetchQuotesFromServer();
 
-    // Then, use map to create the DOM elements from those quotes
-    const elements = matchingQuotes.map(quote => {
-        const aquote = document.createElement("h3");
-        aquote.innerHTML = quote.name;
-        return aquote;
+    // Retrieve existing quotes from localStorage
+    const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+    // Merge both sets of data and resolve conflicts
+    const mergedQuotes = resolveConflicts(localQuotes, serverQuotes);
+
+    // Save the updated merged list back to localStorage
+    localStorage.setItem("quotes", JSON.stringify(mergedQuotes));
+
+    // Log and update UI
+    console.log("Quotes synced successfully:", mergedQuotes);
+    populateCategories(); // Refresh category dropdown if it exists
+}
+
+// ⏱️ Automatically sync every 30 seconds
+    setInterval(syncQuotes, 30000);
+    
+
+    /**********************************************************
+ * STEP 3: HANDLE CONFLICTS
+ **********************************************************/
+
+// This function merges local and server data, preferring the server version
+function resolveConflicts(localQuotes, serverQuotes) {
+    // Start by copying local quotes so we don’t mutate the original array
+    const merged = [...localQuotes];
+
+    // Loop through each quote object fetched from the server
+    serverQuotes.forEach(serverQuote => {
+        // Check if we already have this category locally
+        const existingIndex = merged.findIndex(q => q.category === serverQuote.category);
+
+        if (existingIndex >= 0) {
+            // ⚠️ Conflict detected: category exists both locally and on the server
+            // Strategy: SERVER WINS — overwrite the local version
+            merged[existingIndex] = serverQuote;
+
+            // Notify the user that a conflict was resolved
+            notifyUser(`Conflict resolved: Updated category "${serverQuote.category}" from server`);
+        } else {
+            // ✅ New category from server — just add it
+            merged.push(serverQuote);
+            notifyUser(`New category "${serverQuote.category}" added from server`);
+        }
     });
 
-// Finally, append all elements to the display (you could also use forEach here if preferred)
-elements.forEach(el => quoteDisplay.appendChild(el));
+    // Return the fully merged and conflict-free array
+    return merged;
+}
+
+
+    /**********************************************************
+ * STEP 4: USER NOTIFICATION SYSTEM
+ **********************************************************/
+
+// Displays small pop-up messages on the screen for a few seconds
+function notifyUser(message) {
+    // Create a <div> element dynamically
+    const notification = document.createElement("div");
+    notification.textContent = message;
+
+    // Add some simple styles for visibility
+    notification.style.cssText = `
+        background: #222;
+        color: #fff;
+        padding: 10px 14px;
+        border-radius: 8px;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        font-size: 14px;
+        z-index: 9999;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        transition: opacity 0.5s ease;
+    `;
+
+    // Attach it to the webpage
+    document.body.appendChild(notification);
+
+    // Remove after 4 seconds
+    setTimeout(() => {
+        notification.style.opacity = "0";
+        setTimeout(() => notification.remove(), 500);
+    }, 4000);
+}
+
     
-        }
+    /**********************************************************
+ * OPTIONAL: MANUAL CONFLICT RESOLUTION
+ **********************************************************/
+
+// This function allows the user to decide if they want to
+// keep their local version instead of replacing it with the server’s version.
+function askUserToResolveConflict(local, server) {
+    return confirm(
+        `Conflict detected for "${server.category}".\n` +
+        `Local quote: "${local.name}"\n` +
+        `Server quote: "${server.name}"\n\n` +
+        `Do you want to use the server version?`
+    );
+}
+
+})
+
+function filterQuotes() {
+    const category = categoryFilter.value;
+    const allquotes = JSON.parse(localStorage.getItem("quotes")) || [];
+    quoteDisplay.innerHTML = "";
+
+    // Find the category object
+    const matchingCategory = allquotes.find(quote => quote.category === category);
+
+    if (!matchingCategory) {
+        const msg = document.createElement("p");
+        msg.textContent = "No quotes found for this category.";
+        msg.style.color = "gray";
+        quoteDisplay.appendChild(msg);
+        return;
+    }
+
+    // Loop through each quote string inside the category
+    matchingCategory.name.forEach(singleQuote => {
+        const aquote = document.createElement("h3");
+        aquote.textContent = singleQuote;
+        quoteDisplay.appendChild(aquote);
+    });
+}

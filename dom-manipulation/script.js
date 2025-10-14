@@ -84,16 +84,51 @@ document.addEventListener("DOMContentLoaded", function () {
     
         showRandomQuote()
     ))
+
+    function populateCategories() {
+        
+        let allquotes = JSON.parse(localStorage.getItem("quotes"))
+        let categorySet = new Set()
+        allquotes.forEach(quote => {
+            categorySet.add(quote.category)
+        });
+        categorySet.forEach(function (category) {
+            const option = document.createElement('option');
+            option.textContent = category
+            categoryFilter.appendChild(option)
+        })
+       
+   
+        // filterQuotes()
+    }
+    window.onload = populateCategories;
  
     window.addQuote = function () {
-        let thenewQuote = newQuoteCategory.value
+        let thenewQuoteCategory = newQuoteCategory.value.toUpperCase()
         let thenewQuoteText = newQuoteText.value
 
-        if (thenewQuote.length > 0 && thenewQuoteText.length > 0) {
+        if (thenewQuoteCategory.length > 0 && thenewQuoteText.length > 0) {
             quoteDisplay.innerHTML=""
-            let createAddQuoteForm = { category: thenewQuote, name: thenewQuoteText }
-            quotes.push(createAddQuoteForm)
-            localStorage.setItem("quotes", JSON.stringify(quotes))
+            // let createAddQuoteForm = { category: thenewQuoteCategory, name: thenewQuoteText }
+            // quotes.push(createAddQuoteForm)
+
+            // Fetch all code from local Storage to check category
+            let allquotes = JSON.parse(localStorage.getItem("quotes")) //Fetch all quotes from the local storage
+            console.log(allquotes)
+            let createAddQuoteForm
+            let categorySet = new Set()
+            allquotes.forEach(quote => {
+                categorySet.add(quote.category) // store it into the categorySet
+            });
+            categorySet.add(thenewQuoteCategory) // add the new it to the categorySet
+            categorySet.forEach(function (category) {
+                if (thenewQuoteCategory.toUpperCase() === category.toUpperCase()) {
+                    createAddQuoteForm = { category: thenewQuoteCategory, name: thenewQuoteText }
+                    allquotes.push(createAddQuoteForm) 
+                }
+            })
+            localStorage.setItem("quotes", JSON.stringify(allquotes))
+            populateCategories()
             newQuoteCategory.value = ""
             newQuoteText.value = ""
             let newQuote = document.createElement("h3")
@@ -140,22 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
     //      localStorage.setItem("quotes", quotes)
     // );
     
-    window.onload = function populateCategories() {
-        
-        let allquotes = JSON.parse(localStorage.getItem("quotes"))
-        let categorySet = new Set()
-        allquotes.forEach(quote => {
-            categorySet.add(quote.category)
-        });
-        categorySet.forEach(function (category) {
-            const option = document.createElement('option');
-            option.textContent = category
-            categoryFilter.appendChild(option)
-        })
-       
    
-        // filterQuotes()
-    }
 
      
      

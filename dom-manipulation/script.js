@@ -185,7 +185,7 @@ async function fetchQuotesFromServer() {
     }
 }
 
-async function syncLocalQuotesToServer() {
+async function syncQuotes() {
     const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
 
     console.log("Syncing local quotes to server...");
@@ -211,7 +211,7 @@ async function syncLocalQuotesToServer() {
 // Run once, then periodically
 fetchQuotesFromServer();
 setInterval(fetchQuotesFromServer, 100000);
-setInterval(syncLocalQuotesToServer, 300000);
+setInterval(syncQuotes, 300000);
 
 
     function askUserToResolveConflict(local, server) {

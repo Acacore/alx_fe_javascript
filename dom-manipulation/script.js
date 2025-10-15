@@ -1,6 +1,6 @@
 let categoryFilter
 document.addEventListener("DOMContentLoaded", function () {
-    localStorage.removeItem("quotes");
+
     let quoteDisplay = document.querySelector("#quoteDisplay")
     let newQuote = document.querySelector("#newQuote")
     let newQuoteCategory = document.querySelector("#newQuoteCategory")
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     window.onload = populateCategories;
  
-    window.addQuote = function () {
+    window.createAddQuoteForm = function () {
         const thenewQuoteCategory = newQuoteCategory.value.trim().toUpperCase();
         const thenewQuoteText = newQuoteText.value.trim();
 

@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
 
-    const URL_SERVER = "https://api.allorigins.win/raw?url=https://kimiquotes.pages.dev/api/quotes";
+    const URL_SERVER = "https://jsonplaceholder.typicode.com/posts";
 
     async function fetchQuotesFromServer() {
         console.log("Data fetching from the server")

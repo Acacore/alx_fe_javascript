@@ -156,39 +156,62 @@ document.addEventListener("DOMContentLoaded", function () {
         link.click()
     }
     
+const URL_SERVER = "https://jsonplaceholder.typicode.com/posts";
 
-    const URL_SERVER = "https://jsonplaceholder.typicode.com/posts";
+async function fetchQuotesFromServer() {
+    console.log("Fetching quotes from server...");
+    try {
+        const response = await fetch(URL_SERVER);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-    async function fetchQuotesFromServer() {
-        console.log("Data fetching from the server")
-        try {
-            const response = await fetch(URL_SERVER)
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
+        const serverQuotes = await response.json();
+        console.log("Data fetched from server:", serverQuotes);
 
-            const serverQuotes = await response.json()
-            console.log("Data Fetch from the server:", serverQuotes)
-            let localQuotes = JSON.parse(localStorage.getItem("quotes")) || []
-            
-            const localMap = new Map(localQuotes.map(q=> [q.id, q]))
-            
-            // Sync — server data takes precedence
-            serverQuotes.forEach(serverQuote => {
-                localMap.set(serverQuote.id, serverQuote)
+        let localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+        const localMap = new Map(localQuotes.map(q => [q.id, q]));
+
+        // Server data takes precedence
+        serverQuotes.forEach(serverQuote => {
+            localMap.set(serverQuote.id, serverQuote);
+        });
+
+        const mergedQuotes = Array.from(localMap.values());
+        localStorage.setItem("quotes", JSON.stringify(mergedQuotes));
+
+        console.log("Local storage updated successfully.");
+    } catch (error) {
+        console.error("Error fetching from server:", error);
+    }
+}
+
+async function syncLocalQuotesToServer() {
+    const localQuotes = JSON.parse(localStorage.getItem("quotes")) || [];
+
+    console.log("Syncing local quotes to server...");
+    try {
+        for (const quote of localQuotes) {
+            const response = await fetch(URL_SERVER, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(quote),
             });
 
-            const mergedQuotes = Array.from(localMap.values());
-            localStorage.setItem("quotes", JSON.stringify(mergedQuotes));
-            console.log("Sync complete. Local storage updated with success")
-
-        } catch (error) {
-            console.log(error)
+            if (!response.ok) {
+                console.error(`Failed to upload quote ID ${quote.id}`);
+            }
         }
 
+        console.log("All local quotes synced to server (simulated).");
+    } catch (error) {
+        console.error("Error syncing local quotes:", error);
     }
-    fetchQuotesFromServer()
-    setInterval(fetchQuotesFromServer, 100000);
+}
+
+// Run once, then periodically
+fetchQuotesFromServer();
+setInterval(fetchQuotesFromServer, 100000);
+setInterval(syncLocalQuotesToServer, 300000);
 
 
     function askUserToResolveConflict(local, server) {

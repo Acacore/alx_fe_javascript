@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function showRandomQuote() {
         quoteDisplay.innerHTML = "";
 
-        const allquotes = JSON.parse(localStorage.getItem("quotes")) || [];
+        const allquotes = JSON.parse(localStorage.getItem("quotations")) || [];
 
         // Get selected category from dropdown
         const selectedCategory = document.getElementById("categoryFilter").value;
@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
         newQuote.textContent = `"${randomQuote}"`;
         quoteDisplay.appendChild(newQuote);
 
-        console.log(`📜 Random quote from ${selectedCategory}: ${randomQuote}`);
+        console.log(`Random quote from ${selectedCategory}: ${randomQuote}`);
     }
 
 
@@ -59,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function populateCategories() {
         
-        let allquotes = JSON.parse(localStorage.getItem("quotes"))
+        let allquotes = JSON.parse(localStorage.getItem("quotations"))
         let categorySet = new Set()
         allquotes.forEach(quote => {
             categorySet.add(quote.category)
@@ -90,7 +90,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Fetch all quotes from localStorage
-        let allquotes = JSON.parse(localStorage.getItem("quotes")) || [];
+        let allquotes = JSON.parse(localStorage.getItem("quotations")) || [];
 
         // Check if category already exists
         let existingCategory = allquotes.find(
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
 
         // Save updated quotes back to localStorage
-        localStorage.setItem("quotes", JSON.stringify(allquotes));
+        localStorage.setItem("quotations", JSON.stringify(allquotes));
 
 
         // Update dropdown in real-time
@@ -145,17 +145,25 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     window.exportQuote = function () {
-        console.log("Hello")
-        arrayQuotes = localStorage.getItem("quotes")
+        arrayQuotes = localStorage.getItem("quotations")
     
         quotes = new Blob([arrayQuotes], { type: "application/json" })
         const objectUrl = URL.createObjectURL(quotes)
         let link = document.createElement("a")
         link.setAttribute("href", objectUrl)
-        link.setAttribute("download", "quotes.JSON")
+        link.setAttribute("download", "quotations.JSON")
         link.click()
     }
     
+    function askUserToResolveConflict(local, server) {
+        return confirm(
+            `Conflict detected for "${server.category}".\n` +
+            `Local quote: "${local.name}"\n` +
+            `Server quote: "${server.name}"\n\n` +
+            `Do you want to use the server version?`
+        );
+    }
+
 const URL_SERVER = "https://jsonplaceholder.typicode.com/posts";
 
 async function fetchQuotesFromServer() {
@@ -173,14 +181,20 @@ async function fetchQuotesFromServer() {
 
         // Server data takes precedence
         serverQuotes.forEach(serverQuote => {
-            localMap.set(serverQuote.id, serverQuote);
+            const localQuote = localMap.get(serverQuote.id);
+            if (!localQuote) {
+                localMap.set(serverQuote.id, serverQuote);
+            } else if (JSON.stringify(localQuote) !== JSON.stringify(serverQuote)) {
+                resolveConflict(localQuote, serverQuote);
+            }
         });
 
         const mergedQuotes = Array.from(localMap.values());
         localStorage.setItem("quotes", JSON.stringify(mergedQuotes));
-
+        showNotification("Quotes updated successfully!");
         console.log("Local storage updated successfully.");
     } catch (error) {
+        showNotification("Failed to fetch data from server.");
         console.error("Error fetching from server:", error);
     }
 }
@@ -213,21 +227,25 @@ fetchQuotesFromServer();
 setInterval(fetchQuotesFromServer, 100000);
 setInterval(syncQuotes, 300000);
 
+    
+  function showNotification(message, duration = 3000) {
+  const notif = document.getElementById("notification");
+  notif.textContent = message;
+  notif.style.display = "block";
 
-    function askUserToResolveConflict(local, server) {
-        return confirm(
-            `Conflict detected for "${server.category}".\n` +
-            `Local quote: "${local.name}"\n` +
-            `Server quote: "${server.name}"\n\n` +
-            `Do you want to use the server version?`
-        );
-    }
+  setTimeout(() => {
+    notif.style.display = "none";
+  }, duration);
+}
+
+
+    
 
 });
 
 function filterQuotes() {
     const category = categoryFilter.value;
-    const allquotes = JSON.parse(localStorage.getItem("quotes")) || [];
+    const allquotes = JSON.parse(localStorage.getItem("quotations")) || [];
     quoteDisplay.innerHTML = "";
 
     // Find the category object

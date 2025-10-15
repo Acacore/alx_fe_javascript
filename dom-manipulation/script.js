@@ -216,7 +216,7 @@ async function syncQuotes() {
             }
         }
 
-        console.log("All local quotes synced to server (simulated).");
+        console.log("Quotes synced with server");
     } catch (error) {
         console.error("Error syncing local quotes:", error);
     }
